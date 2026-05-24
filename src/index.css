@@ -1,0 +1,258 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design tokens ───────────────────────────────────────────────────── */
+:root {
+  --bg: #020818;
+  --surface: #0a1628;
+  --accent-cyan: #00d4ff;
+  --accent-purple: #7c3aed;
+  --accent-green: #10b981;
+  --text: #f8fafc;
+  --text-muted: rgba(248,250,252,0.45);
+}
+
+/* ── Base ────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+::-webkit-scrollbar { display: none; }
+* { scrollbar-width: none; }
+
+body {
+  background: var(--bg);
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* ── Reveal.js overrides ─────────────────────────────────────────────── */
+.reveal {
+  font-family: 'Inter', sans-serif;
+  background: transparent !important;
+}
+.reveal .slides { text-align: left; }
+.reveal .slides section {
+  position: relative;
+  overflow: hidden;
+  height: 100dvh;
+  padding: 0 !important;
+  top: 0 !important;
+}
+.reveal .progress {
+  color: var(--accent-cyan);
+  height: 2px;
+  background: rgba(0,212,255,0.12);
+}
+.reveal .progress span { background: var(--accent-cyan); }
+.reveal .controls { color: var(--accent-cyan); }
+.reveal .controls button { opacity: 0.25; transition: opacity 200ms; }
+.reveal .controls button:hover { opacity: 1; }
+
+/* ── Ghost slide numbers ──────────────────────────────────────────────── */
+.ghost-num {
+  position: absolute;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 28vw;
+  font-weight: 900;
+  color: rgba(0,212,255,0.025);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+/* ── Glassmorphism card ───────────────────────────────────────────────── */
+.glass-card {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+}
+.glass-card-cyan {
+  background: rgba(0,212,255,0.04);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0,212,255,0.15);
+  border-radius: 16px;
+  box-shadow: 0 0 40px rgba(0,212,255,0.06), inset 0 1px 0 rgba(0,212,255,0.1);
+}
+
+/* ── Gradient text ────────────────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #00d4ff, #6366f1, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.gradient-text-warm {
+  background: linear-gradient(135deg, #00d4ff, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Glow effects ─────────────────────────────────────────────────────── */
+.glow-cyan {
+  box-shadow: 0 0 30px rgba(0,212,255,0.3), 0 0 60px rgba(0,212,255,0.1);
+}
+.glow-purple {
+  box-shadow: 0 0 30px rgba(124,58,237,0.3), 0 0 60px rgba(124,58,237,0.1);
+}
+.glow-green {
+  box-shadow: 0 0 30px rgba(16,185,129,0.3);
+}
+.text-glow-cyan {
+  text-shadow: 0 0 20px rgba(0,212,255,0.6), 0 0 40px rgba(0,212,255,0.3);
+}
+.text-glow-purple {
+  text-shadow: 0 0 20px rgba(139,92,246,0.6), 0 0 40px rgba(139,92,246,0.3);
+}
+
+/* ── Eyebrow tags ─────────────────────────────────────────────────────── */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  border: 1px solid rgba(0,212,255,0.25);
+  color: rgba(0,212,255,0.75);
+  font-family: 'Orbitron', sans-serif;
+  background: rgba(0,212,255,0.06);
+}
+
+/* ── Slide titles ─────────────────────────────────────────────────────── */
+.slide-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-weight: 900;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+.slide-title-sm {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.5rem, 3.5vw, 3rem);
+  font-weight: 900;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+/* ── Data cards ───────────────────────────────────────────────────────── */
+.data-card {
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+}
+.bezel-outer {
+  padding: 1px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(124,58,237,0.1), transparent);
+}
+.bezel-inner {
+  border-radius: 11px;
+  background: rgba(2,8,24,0.85);
+  backdrop-filter: blur(12px);
+}
+
+/* ── Misc utilities ───────────────────────────────────────────────────── */
+.mono-data {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: rgba(0,212,255,0.85);
+  letter-spacing: 0.06em;
+}
+.diagram-label {
+  font-size: 0.58rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+.h-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255,255,255,0.07);
+}
+
+/* ── Slider override ──────────────────────────────────────────────────── */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 3px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 999px;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #00d4ff;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0,212,255,0.6);
+  transition: box-shadow 200ms;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 20px rgba(0,212,255,0.9);
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 999px;
+}
+
+/* ── Sine wave animation ──────────────────────────────────────────────── */
+@keyframes sineMove {
+  from { stroke-dashoffset: 60; }
+  to { stroke-dashoffset: 0; }
+}
+.animate-sine-move {
+  animation: sineMove 3s linear infinite;
+  stroke-dasharray: 12 4;
+}
+
+/* ── Loss chart draw ──────────────────────────────────────────────────── */
+@keyframes drawLoss {
+  from { stroke-dashoffset: 1200; }
+  to { stroke-dashoffset: 0; }
+}
+.loss-path {
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 0;
+  animation: drawLoss 2.5s cubic-bezier(0.23,1,0.32,1) forwards;
+}
+
+/* ── Confetti ─────────────────────────────────────────────────────────── */
+#confetti-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* ── Loader ───────────────────────────────────────────────────────────── */
+.loader {
+  width: 2rem; height: 2rem;
+  border: 2px solid rgba(0,212,255,0.15);
+  border-top-color: #00d4ff;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Reveal fragment tweaks ───────────────────────────────────────────── */
+.reveal .fragment { opacity: 0; transition: opacity 0.4s ease, transform 0.4s ease; transform: translateY(12px); }
+.reveal .fragment.visible { opacity: 1; transform: translateY(0); }
