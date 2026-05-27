@@ -99,49 +99,49 @@ export function Slide14Ethics() {
                 <div key={index} className="fragment" data-fragment-index={index}>
                   <motion.div
                     animate={isActive
-                      ? { opacity: 1, borderColor: `${accent}35` }
-                      : { opacity: 0.55, borderColor: 'rgba(255,255,255,0.08)' }
+                      ? { opacity: 1, borderColor: `${accent}45` }
+                      : { opacity: 0.75, borderColor: 'rgba(255,255,255,0.12)' }
                     }
                     transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
                     style={{
                       borderRadius: 16,
                       border: '1px solid',
                       background: isActive
-                        ? `linear-gradient(135deg, rgba(0,0,0,0.6) 0%, ${accent}08 100%)`
-                        : 'rgba(255,255,255,0.03)',
+                        ? `linear-gradient(135deg, rgba(0,0,0,0.55) 0%, ${accent}10 100%)`
+                        : 'rgba(255,255,255,0.04)',
                       backdropFilter: 'blur(12px)',
-                      boxShadow: isActive ? `0 0 40px ${accent}18, inset 0 1px 0 rgba(255,255,255,0.06)` : 'none',
-                      padding: '18px 22px',
+                      boxShadow: isActive ? `0 0 40px ${accent}22, inset 0 1px 0 rgba(255,255,255,0.07)` : 'none',
+                      padding: '20px 24px',
                       display: 'flex',
                       alignItems: 'flex-start',
-                      gap: 18,
+                      gap: 20,
                     }}
                   >
                     <motion.div
                       animate={isActive
-                        ? { background: `${accent}18`, boxShadow: `0 0 28px ${accent}40`, borderColor: `${accent}50` }
-                        : { background: 'rgba(255,255,255,0.04)', boxShadow: 'none', borderColor: 'rgba(255,255,255,0.1)' }
+                        ? { background: `${accent}20`, boxShadow: `0 0 28px ${accent}50`, borderColor: `${accent}60` }
+                        : { background: 'rgba(255,255,255,0.06)', boxShadow: 'none', borderColor: 'rgba(255,255,255,0.15)' }
                       }
                       style={{
-                        flexShrink: 0, width: 52, height: 52, borderRadius: 13,
+                        flexShrink: 0, width: 56, height: 56, borderRadius: 13,
                         border: '1px solid', display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}
                     >
-                      <Icon size={22} color={isActive ? accent : 'rgba(255,255,255,0.3)'} />
+                      <Icon size={24} color={isActive ? accent : 'rgba(255,255,255,0.45)'} />
                     </motion.div>
 
-                    <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+                    <div className="flex flex-col gap-1 flex-1 min-w-0">
                       <span
-                        className="font-orbitron text-[0.6rem] font-bold tracking-[0.18em]"
-                        style={{ color: isActive ? `${accent}90` : 'rgba(255,255,255,0.2)' }}
+                        className="font-orbitron text-[0.65rem] font-bold tracking-[0.18em]"
+                        style={{ color: isActive ? accent : 'rgba(255,255,255,0.3)' }}
                       >
                         {tag}
                       </span>
                       <div
                         className="font-orbitron font-black"
                         style={{
-                          fontSize: 'clamp(0.88rem, 1.7vw, 1.05rem)',
-                          color: isActive ? '#ffffff' : 'rgba(255,255,255,0.5)',
+                          fontSize: 'clamp(0.95rem, 1.8vw, 1.15rem)',
+                          color: isActive ? '#ffffff' : 'rgba(255,255,255,0.65)',
                           lineHeight: 1.3,
                         }}
                       >
@@ -150,15 +150,15 @@ export function Slide14Ethics() {
                       <p
                         className="font-inter leading-relaxed"
                         style={{
-                          fontSize: 'clamp(0.78rem, 1.3vw, 0.88rem)',
-                          color: isActive ? 'rgba(255,255,255,0.68)' : 'rgba(255,255,255,0.3)',
+                          fontSize: 'clamp(0.85rem, 1.5vw, 0.96rem)',
+                          color: isActive ? 'rgba(255,255,255,0.82)' : 'rgba(255,255,255,0.5)',
                         }}
                       >
                         {body}
                       </p>
                       {isActive && (
-                        <p className="font-inter text-xs mt-1 leading-relaxed" style={{ color: `${accent}65` }}>
-                          {detail}
+                        <p className="font-inter text-sm mt-1 leading-relaxed" style={{ color: `${accent}` }}>
+                          ↳ {detail}
                         </p>
                       )}
                     </div>
@@ -166,7 +166,7 @@ export function Slide14Ethics() {
                     <motion.div
                       animate={{ opacity: isActive ? 1 : 0, scaleY: isActive ? 1 : 0 }}
                       style={{
-                        flexShrink: 0, width: 3, height: 44, borderRadius: 99,
+                        flexShrink: 0, width: 3, height: 50, borderRadius: 99,
                         background: `linear-gradient(to bottom, ${accent}, ${accent}40)`,
                         boxShadow: `0 0 12px ${accent}`,
                         transformOrigin: 'top',
@@ -189,7 +189,7 @@ export function Slide14Ethics() {
                 >
                   <p
                     className="font-orbitron font-black leading-snug"
-                    style={{ fontSize: 'clamp(0.95rem, 2.2vw, 1.35rem)', color: 'rgba(255,255,255,0.95)' }}
+                    style={{ fontSize: 'clamp(1.05rem, 2.5vw, 1.5rem)', color: 'rgba(255,255,255,0.95)' }}
                   >
                     "El desafío no es frenar la IA. Es{' '}
                     <span style={{

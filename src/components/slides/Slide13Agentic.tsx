@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Brain, Layers, Eye, Phone, PhoneOff, Mic } from 'lucide-react'
 
-const VAPI_PUBLIC_KEY = import.meta.env.VITE_VAPI_PUBLIC_KEY as string
-const VAPI_ASSISTANT_ID = import.meta.env.VITE_VAPI_ASSISTANT_ID as string
+const VAPI_PUBLIC_KEY = (import.meta.env.VITE_VAPI_PUBLIC_KEY as string) || '5d3e7926-3cdd-477b-8bc8-736a093bb48d'
+const VAPI_ASSISTANT_ID = (import.meta.env.VITE_VAPI_ASSISTANT_ID as string) || 'c5c43d40-74b0-436c-af8c-60f47aaacf26'
+const VAPI_DEMO_URL = 'https://vapi.ai?demo=true&shareKey=5d3e7926-3cdd-477b-8bc8-736a093bb48d&assistantId=c5c43d40-74b0-436c-af8c-60f47aaacf26'
 
 type CallState = 'idle' | 'connecting' | 'active' | 'ended'
 interface Props { active: boolean }
@@ -109,8 +110,9 @@ export function Slide13Agentic({ active }: Props) {
       })
       await vapi.start(VAPI_ASSISTANT_ID)
     } catch (err) {
-      console.error('Vapi error:', err)
+      console.error('Vapi SDK error, opening demo URL:', err)
       setCallState('idle')
+      window.open(VAPI_DEMO_URL, '_blank', 'noopener')
     }
   }
 
