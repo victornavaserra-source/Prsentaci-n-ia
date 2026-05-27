@@ -183,9 +183,9 @@ function VisionCard({ active }: { active: boolean }) {
       </div>
 
       {/* Grid + RGB readout side by side */}
-      <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 16, alignItems: 'center', justifyContent: 'center' }}>
         {/* Pixel grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${PIXEL_COLS}, 1fr)`, gap: 3, flexShrink: 0 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${PIXEL_COLS}, 20px)`, gap: 3, flexShrink: 0 }}>
           {PIXEL_DATA.map(({ r, g, b }, i) => {
             const row = Math.floor(i / PIXEL_COLS)
             const isRevealed = i < filled
