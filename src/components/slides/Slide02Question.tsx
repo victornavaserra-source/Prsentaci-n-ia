@@ -7,10 +7,29 @@ const LINES = [
   'datos físicos del mundo real',
   'a tomar decisiones que parecen inteligentes?',
 ]
-const ICONS = [
-  { Icon: Thermometer, label: 'Señal física' },
-  { Icon: Cpu, label: 'Procesamiento' },
-  { Icon: Sparkles, label: 'Decisión' },
+
+const PIPELINE = [
+  {
+    Icon: Thermometer,
+    label: 'Señal Física',
+    desc: 'Temperatura · Luz · Sonido · Presión',
+    color: '#00d4ff',
+    tag: '01',
+  },
+  {
+    Icon: Cpu,
+    label: 'Procesamiento',
+    desc: 'Digitalización · Modelo · Cálculo',
+    color: '#8b5cf6',
+    tag: '02',
+  },
+  {
+    Icon: Sparkles,
+    label: 'Decisión',
+    desc: 'Predicción · Clasificación · Acción',
+    color: '#10b981',
+    tag: '03',
+  },
 ]
 
 function useTypewriter(text: string, active: boolean, delay: number) {
@@ -48,10 +67,10 @@ export function Slide02Question({ active }: Props) {
 
   return (
     <section>
-      <div className="relative w-full h-[100dvh] flex flex-col items-center justify-center px-8 md:px-20 gap-16">
+      <div className="relative w-full h-[100dvh] flex flex-col items-center justify-center px-8 md:px-20 gap-14">
         <span className="ghost-num">02</span>
 
-        <div className="relative z-10 max-w-4xl w-full flex flex-col gap-14">
+        <div className="relative z-10 max-w-4xl w-full flex flex-col gap-12">
 
           <div className="flex justify-center">
             <span className="eyebrow">La pregunta central</span>
@@ -72,7 +91,6 @@ export function Slide02Question({ active }: Props) {
                     }}
                   >
                     {displayed}
-                    {/* Blinking cursor on current line */}
                     {i === 0 && !line1.done && <span className="animate-blink">|</span>}
                     {i === 1 && line1.done && !line2.done && <span className="animate-blink">|</span>}
                     {i === 2 && line2.done && !line3.done && <span className="animate-blink">|</span>}
@@ -82,31 +100,125 @@ export function Slide02Question({ active }: Props) {
             ))}
           </div>
 
-          {/* Icons */}
+          {/* Pipeline cards */}
           <AnimatePresence>
             {showIcons && (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-                className="grid grid-cols-3 gap-8"
+                transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
+                style={{ display: 'flex', alignItems: 'stretch', gap: 0 }}
               >
-                {ICONS.map(({ Icon, label }, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: i * 0.15, duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-                    className="flex flex-col items-center gap-3"
-                  >
-                    <div
-                      className="glass-card-cyan flex items-center justify-center"
-                      style={{ width: 56, height: 56, boxShadow: '0 0 30px rgba(0,212,255,0.2)' }}
+                {PIPELINE.map(({ Icon, label, desc, color, tag }, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                    {/* Card */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20, scale: 0.92 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ delay: i * 0.18, duration: 0.55, ease: [0.23, 1, 0.32, 1] }}
+                      style={{
+                        flex: 1,
+                        borderRadius: 18,
+                        border: `1px solid ${color}30`,
+                        background: `linear-gradient(135deg, rgba(0,0,0,0.6) 0%, ${color}08 100%)`,
+                        backdropFilter: 'blur(16px)',
+                        boxShadow: `0 0 40px ${color}15, inset 0 1px 0 rgba(255,255,255,0.06)`,
+                        padding: '22px 20px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 14,
+                        position: 'relative',
+                        overflow: 'hidden',
+                      }}
                     >
-                      <Icon size={22} color="#00d4ff" />
-                    </div>
-                    <span className="font-inter text-xs text-white/40 tracking-wider uppercase">{label}</span>
-                  </motion.div>
+                      {/* Step number */}
+                      <div style={{
+                        position: 'absolute', top: 12, right: 14,
+                        fontFamily: 'Orbitron, sans-serif',
+                        fontSize: '0.55rem', fontWeight: 700,
+                        color: `${color}50`,
+                        letterSpacing: '0.15em',
+                      }}>
+                        {tag}
+                      </div>
+
+                      {/* Corner accent */}
+                      <div style={{
+                        position: 'absolute', top: 0, left: 0,
+                        width: 40, height: 40,
+                        background: `radial-gradient(circle at 0% 0%, ${color}20, transparent 70%)`,
+                        borderRadius: '18px 0 0 0',
+                      }} />
+
+                      {/* Icon */}
+                      <div style={{
+                        width: 64, height: 64,
+                        borderRadius: 18,
+                        border: `1px solid ${color}40`,
+                        background: `${color}12`,
+                        boxShadow: `0 0 30px ${color}25, inset 0 1px 0 ${color}20`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        <Icon size={26} color={color} style={{ filter: `drop-shadow(0 0 8px ${color})` }} />
+                      </div>
+
+                      {/* Label */}
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                        <span style={{
+                          fontFamily: 'Orbitron, sans-serif',
+                          fontSize: 'clamp(0.75rem, 1.4vw, 0.95rem)',
+                          fontWeight: 900,
+                          color: '#ffffff',
+                          letterSpacing: '0.04em',
+                          textAlign: 'center',
+                        }}>
+                          {label}
+                        </span>
+                        <span style={{
+                          fontFamily: 'Inter, sans-serif',
+                          fontSize: '0.68rem',
+                          color: 'rgba(255,255,255,0.4)',
+                          textAlign: 'center',
+                          lineHeight: 1.5,
+                        }}>
+                          {desc}
+                        </span>
+                      </div>
+
+                      {/* Bottom glow line */}
+                      <div style={{
+                        position: 'absolute', bottom: 0, left: '20%', right: '20%',
+                        height: 1,
+                        background: `linear-gradient(to right, transparent, ${color}60, transparent)`,
+                      }} />
+                    </motion.div>
+
+                    {/* Arrow connector */}
+                    {i < PIPELINE.length - 1 && (
+                      <motion.div
+                        initial={{ opacity: 0, scaleX: 0 }}
+                        animate={{ opacity: 1, scaleX: 1 }}
+                        transition={{ delay: i * 0.18 + 0.3, duration: 0.4 }}
+                        style={{
+                          flexShrink: 0, width: 32, display: 'flex', flexDirection: 'column',
+                          alignItems: 'center', gap: 4,
+                        }}
+                      >
+                        <div style={{
+                          width: '100%', height: 1,
+                          background: `linear-gradient(to right, ${PIPELINE[i].color}40, ${PIPELINE[i + 1].color}40)`,
+                        }} />
+                        <div style={{
+                          width: 0, height: 0,
+                          borderLeft: `6px solid ${PIPELINE[i].color}60`,
+                          borderTop: '4px solid transparent',
+                          borderBottom: '4px solid transparent',
+                          marginLeft: 6,
+                        }} />
+                      </motion.div>
+                    )}
+                  </div>
                 ))}
               </motion.div>
             )}

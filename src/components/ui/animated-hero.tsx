@@ -95,17 +95,17 @@ export function Hero({ onScrollDown, onJumpToConclusions }: HeroProps) {
         >
           <div
             style={{
-              fontSize: 'clamp(2.5rem, 8.5vw, 9.5rem)',
+              fontSize: 'clamp(2rem, 7vw, 7.5rem)',
               background: 'linear-gradient(135deg, #00d4ff 0%, #6366f1 50%, #8b5cf6 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
             }}
           >
-            De la realidad
+            Cómo funcionan las
           </div>
-          <div style={{ fontSize: 'clamp(2.5rem, 8.5vw, 9.5rem)', color: 'rgba(255,255,255,0.12)' }}>
-            física al digital
+          <div style={{ fontSize: 'clamp(2rem, 7vw, 7.5rem)', color: 'rgba(255,255,255,0.12)' }}>
+            inteligencias artificiales
           </div>
         </motion.h1>
 
@@ -135,7 +135,7 @@ export function Hero({ onScrollDown, onJumpToConclusions }: HeroProps) {
             fontFamily: 'Inter, sans-serif',
           }}
         >
-          Cómo convierte una máquina las señales físicas del mundo real en decisiones que parecen inteligentes.
+          Datos · modelos · toma de decisiones digitales
         </motion.p>
 
         {/* CTAs */}
