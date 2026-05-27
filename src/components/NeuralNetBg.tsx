@@ -7,7 +7,7 @@ const CYAN = 0x00d4ff
 const LAYERS = [4, 6, 6, 3]
 const LAYER_X = [-5.5, -1.83, 1.83, 5.5]
 const V_SPREAD = 4.0
-const Z_SPREAD = 1.6
+const Z_SPREAD = 2.8   // big enough to be obviously 3D
 
 const INPUT_LABELS = ['Sonido', 'Imagen', 'Texto', 'Datos']
 const OUTPUT_LABELS = ['Clasificar', 'Predecir', 'Generar']
@@ -76,9 +76,9 @@ export function NeuralNetBg({ className, mode = 'background', showLabels }: Neur
     })
 
     // ── Nodes: main sphere + glow sphere ─────────────────────────────────────
-    const mainGeo = new THREE.SphereGeometry(0.13, 20, 20)
-    const glowGeo = new THREE.SphereGeometry(0.32, 12, 12)
-    const outerGeo = new THREE.SphereGeometry(0.55, 10, 10)
+    const mainGeo = new THREE.SphereGeometry(0.17, 20, 20)   // bigger nodes
+    const glowGeo = new THREE.SphereGeometry(0.40, 12, 12)
+    const outerGeo = new THREE.SphereGeometry(0.68, 10, 10)
 
     interface NodeData {
       main: THREE.Mesh
@@ -142,7 +142,7 @@ export function NeuralNetBg({ className, mode = 'background', showLabels }: Neur
       for (let a = 0; a < LAYERS[li]; a++) {
         for (let b = 0; b < LAYERS[li + 1]; b++) {
           const geo = new THREE.BufferGeometry().setFromPoints([nodePos[li][a], nodePos[li + 1][b]])
-          const mat = new THREE.LineBasicMaterial({ color: CYAN, transparent: true, opacity: 0.07 })
+          const mat = new THREE.LineBasicMaterial({ color: CYAN, transparent: true, opacity: 0.13 })
           const line = new THREE.Line(geo, mat)
           group.add(line)
           const edge: EdgeData = { line, mat, fromLayer: li, fromNode: a, toLayer: li + 1, toNode: b }
@@ -271,8 +271,8 @@ export function NeuralNetBg({ className, mode = 'background', showLabels }: Neur
       prevTime = now
 
       // Camera orbit
-      autoTheta += 0.00045
-      const phi = mode === 'panel' ? 0.12 : 0.08
+      autoTheta += 0.0032   // visible rotation: ~11°/s, full turn in ~33s
+      const phi = mode === 'panel' ? 0.42 : 0.32  // elevated view shows Z depth
       camera.position.set(
         camDist * Math.sin(autoTheta) * Math.cos(phi),
         camDist * Math.sin(phi),
@@ -312,7 +312,7 @@ export function NeuralNetBg({ className, mode = 'background', showLabels }: Neur
           const to = nodePos[pulse.edge.toLayer][pulse.edge.toNode]
           pulse.mesh.position.lerpVectors(from, to, pulse.progress)
           pulse.light.position.copy(pulse.mesh.position)
-          pulse.edge.mat.opacity = 0.07 + pulse.progress * 0.58
+          pulse.edge.mat.opacity = 0.13 + pulse.progress * 0.62
         }
       }
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Brain, Layers, Eye, Phone, PhoneOff, Mic } from 'lucide-react'
+import { AutonomousAgent3D } from '@/components/AutonomousAgent3D'
 
 const VAPI_PUBLIC_KEY = (import.meta.env.VITE_VAPI_PUBLIC_KEY as string) || '5d3e7926-3cdd-477b-8bc8-736a093bb48d'
 const VAPI_ASSISTANT_ID = (import.meta.env.VITE_VAPI_ASSISTANT_ID as string) || 'c5c43d40-74b0-436c-af8c-60f47aaacf26'
@@ -9,66 +10,255 @@ const VAPI_DEMO_URL = 'https://vapi.ai?demo=true&shareKey=5d3e7926-3cdd-477b-8bc
 type CallState = 'idle' | 'connecting' | 'active' | 'ended'
 interface Props { active: boolean }
 
-const CYCLE_STEPS = [
-  { label: 'Percepción', color: '#00d4ff' },
-  { label: 'Razonamiento', color: '#6366f1' },
-  { label: 'Planificación', color: '#8b5cf6' },
-  { label: 'Acción', color: '#a78bfa' },
-  { label: 'Memoria', color: '#c4b5fd' },
+const STEPS = [
+  { label: 'Percepción',   sub: 'Sensores · Input',      color: '#00d4ff', icon: '👁' },
+  { label: 'Razonamiento', sub: 'Procesa contexto',       color: '#6366f1', icon: '🧠' },
+  { label: 'Planificación',sub: 'Define pasos',           color: '#8b5cf6', icon: '📋' },
+  { label: 'Acción',       sub: 'APIs · Herramientas',    color: '#a78bfa', icon: '⚡' },
+  { label: 'Memoria',      sub: 'RAG · Historial',        color: '#c4b5fd', icon: '💾' },
 ]
 
-function AgentCycle({ active }: { active: boolean }) {
+const TOOLS: Record<number, string[]> = {
+  0: ['Vision', 'NLP', 'Audio'],
+  1: ['LLM', 'CoT', 'Context'],
+  2: ['Goals', 'Subtasks', 'Priority'],
+  3: ['Web', 'Code', 'DB'],
+  4: ['Embed', 'Store', 'Retrieve'],
+}
+
+const N = STEPS.length
+const CX = 170, CY = 148, R_ORBIT = 96, R_OUTER = 130
+
+function stepAngle(i: number) { return (-Math.PI / 2) + (i / N) * Math.PI * 2 }
+function stepXY(i: number, r = R_ORBIT) {
+  const a = stepAngle(i)
+  return { x: CX + r * Math.cos(a), y: CY + r * Math.sin(a) }
+}
+
+export function AgentCycle({ active }: { active: boolean }) {
+  const rafRef = useRef<number | null>(null)
   const [activeStep, setActiveStep] = useState(0)
+  const [progress, setProgress] = useState(0)  // 0-1 within current step
 
   useEffect(() => {
-    if (!active) return
-    const id = setInterval(() => setActiveStep(s => (s + 1) % CYCLE_STEPS.length), 750)
-    return () => clearInterval(id)
+    if (!active) { setActiveStep(0); setProgress(0); return }
+    const STEP_MS = 950
+    let start = performance.now()
+    let step = 0
+
+    const tick = (now: number) => {
+      const elapsed = now - start
+      const p = (elapsed % STEP_MS) / STEP_MS
+      const s = Math.floor(elapsed / STEP_MS) % N
+      if (s !== step) { step = s; setActiveStep(s) }
+      setProgress(p)
+      rafRef.current = requestAnimationFrame(tick)
+    }
+    rafRef.current = requestAnimationFrame(tick)
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
   }, [active])
 
-  const cx = 70, cy = 68, r = 48
-  const n = CYCLE_STEPS.length
+  // Pulse particle position: travels from activeStep to next
+  const a1 = stepAngle(activeStep)
+  const a2 = stepAngle((activeStep + 1) % N)
+  let da = a2 - a1
+  if (da > Math.PI) da -= 2 * Math.PI
+  if (da < -Math.PI) da += 2 * Math.PI
+  const pulseA = a1 + da * progress
+  const pulse = { x: CX + R_ORBIT * Math.cos(pulseA), y: CY + R_ORBIT * Math.sin(pulseA) }
+  const activeColor = STEPS[activeStep].color
+
+  // Arc path from step i to step i+1 (clockwise, short arc)
+  function arcPath(i: number) {
+    const p1 = stepXY(i)
+    const p2 = stepXY((i + 1) % N)
+    return `M ${p1.x} ${p1.y} A ${R_ORBIT} ${R_ORBIT} 0 0 1 ${p2.x} ${p2.y}`
+  }
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <svg viewBox="0 0 140 136" width="140" height="136">
-        {CYCLE_STEPS.map((step, i) => {
-          const angle = (i / n) * Math.PI * 2 - Math.PI / 2
-          const nextAngle = (((i + 1) % n) / n) * Math.PI * 2 - Math.PI / 2
-          const x1 = cx + r * Math.cos(angle)
-          const y1 = cy + r * Math.sin(angle)
-          const x2 = cx + r * Math.cos(nextAngle)
-          const y2 = cy + r * Math.sin(nextAngle)
+    <div className="flex flex-col items-center w-full">
+      <svg viewBox="0 0 340 296" className="w-full" style={{ maxWidth: 340 }}>
+        <defs>
+          {STEPS.map((s, i) => (
+            <radialGradient key={i} id={`ng${i}`} cx="40%" cy="35%">
+              <stop offset="0%" stopColor={s.color} stopOpacity="0.95" />
+              <stop offset="100%" stopColor={s.color} stopOpacity="0.25" />
+            </radialGradient>
+          ))}
+          <radialGradient id="centerGrad" cx="50%" cy="50%">
+            <stop offset="0%" stopColor="#00d4ff" stopOpacity="0.9" />
+            <stop offset="60%" stopColor="#6366f1" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.1" />
+          </radialGradient>
+          <filter id="bloom">
+            <feGaussianBlur stdDeviation="5" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+          <filter id="glow2">
+            <feGaussianBlur stdDeviation="2.5" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+        </defs>
+
+        {/* Orbit track */}
+        <circle cx={CX} cy={CY} r={R_ORBIT}
+          fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 3" />
+
+        {/* Radial spokes from center to each node */}
+        {STEPS.map((s, i) => {
+          const { x, y } = stepXY(i)
           const isActive = activeStep === i
           return (
-            <g key={i}>
-              <line x1={x1} y1={y1} x2={x2} y2={y2}
-                stroke={isActive ? step.color : 'rgba(255,255,255,0.1)'}
-                strokeWidth={isActive ? 2 : 1}
+            <line key={i}
+              x1={CX} y1={CY} x2={x} y2={y}
+              stroke={isActive ? s.color : 'rgba(255,255,255,0.04)'}
+              strokeWidth={isActive ? 1 : 0.5}
+              style={{ transition: 'all 0.3s' }}
+            />
+          )
+        })}
+
+        {/* Arcs between steps */}
+        {STEPS.map((_, i) => {
+          const isActive = activeStep === i
+          return (
+            <path key={i} d={arcPath(i)}
+              fill="none"
+              stroke={isActive ? STEPS[i].color : 'rgba(255,255,255,0.08)'}
+              strokeWidth={isActive ? 2 : 0.8}
+              style={{ transition: 'stroke 0.3s, stroke-width 0.3s', filter: isActive ? `drop-shadow(0 0 4px ${STEPS[i].color})` : 'none' }}
+            />
+          )
+        })}
+
+        {/* Traveling pulse particle */}
+        <circle cx={pulse.x} cy={pulse.y} r={5.5}
+          fill={activeColor}
+          style={{ filter: `drop-shadow(0 0 10px ${activeColor})` }}
+        />
+        <circle cx={pulse.x} cy={pulse.y} r={10}
+          fill={activeColor} opacity="0.15"
+        />
+
+        {/* Tool labels in outer ring */}
+        {TOOLS[activeStep].map((tool, ti) => {
+          const baseAngle = stepAngle(activeStep)
+          const spread = 0.32
+          const a = baseAngle + (ti - 1) * spread
+          const tx = CX + R_OUTER * Math.cos(a)
+          const ty = CY + R_OUTER * Math.sin(a)
+          return (
+            <text key={ti} x={tx} y={ty}
+              textAnchor="middle" dominantBaseline="middle"
+              fontSize="7.5" fontFamily="Inter, sans-serif"
+              fill={activeColor} opacity="0.7"
+            >
+              {tool}
+            </text>
+          )
+        })}
+
+        {/* Step nodes */}
+        {STEPS.map((s, i) => {
+          const { x, y } = stepXY(i)
+          const isActive = activeStep === i
+          const nr = isActive ? 22 : 16
+          // Label position: push outward
+          const a = stepAngle(i)
+          const lx = CX + (R_ORBIT + 34) * Math.cos(a)
+          const ly = CY + (R_ORBIT + 34) * Math.sin(a)
+          const subly = CY + (R_ORBIT + 46) * Math.sin(a)
+          return (
+            <g key={i} style={{ transition: 'all 0.3s' }}>
+              {/* Outer glow ring on active */}
+              {isActive && (
+                <circle cx={x} cy={y} r={nr + 8}
+                  fill={`${s.color}12`}
+                  stroke={s.color} strokeWidth="0.5" opacity="0.5"
+                  style={{ filter: `drop-shadow(0 0 12px ${s.color})` }}
+                />
+              )}
+              {/* Node body */}
+              <circle cx={x} cy={y} r={nr}
+                fill={isActive ? `url(#ng${i})` : `${s.color}18`}
+                stroke={s.color}
+                strokeWidth={isActive ? 1.8 : 0.8}
+                style={{
+                  filter: isActive ? `drop-shadow(0 0 10px ${s.color})` : 'none',
+                  transition: 'all 0.35s',
+                }}
+              />
+              {/* Icon */}
+              <text x={x} y={y + 1} textAnchor="middle" dominantBaseline="middle" fontSize={isActive ? 14 : 11}>
+                {s.icon}
+              </text>
+              {/* Labels outside orbit */}
+              <text x={lx} y={ly - 5}
+                textAnchor="middle" dominantBaseline="middle"
+                fontSize={isActive ? 9 : 8}
+                fontFamily="Orbitron, sans-serif"
+                fontWeight="bold"
+                fill={isActive ? s.color : 'rgba(255,255,255,0.4)'}
                 style={{ transition: 'all 0.3s' }}
-              />
-              <circle cx={x1} cy={y1} r={isActive ? 9 : 6}
-                fill={isActive ? `${step.color}25` : 'rgba(255,255,255,0.04)'}
-                stroke={isActive ? step.color : 'rgba(255,255,255,0.18)'}
-                strokeWidth="1.5"
-                style={{ transition: 'all 0.3s', filter: isActive ? `drop-shadow(0 0 6px ${step.color})` : 'none' }}
-              />
-              <circle cx={x1} cy={y1} r={3}
-                fill={isActive ? step.color : 'rgba(255,255,255,0.25)'}
+              >
+                {s.label}
+              </text>
+              <text x={lx} y={subly + 3}
+                textAnchor="middle" dominantBaseline="middle"
+                fontSize="6.5" fontFamily="Inter, sans-serif"
+                fill={isActive ? `${s.color}90` : 'rgba(255,255,255,0.2)'}
                 style={{ transition: 'all 0.3s' }}
-              />
+              >
+                {s.sub}
+              </text>
             </g>
           )
         })}
-        <text x={cx} y={cy + 6} textAnchor="middle" fontSize="22">🤖</text>
+
+        {/* Central brain — 3 concentric rings + core */}
+        <circle cx={CX} cy={CY} r={38}
+          fill="none" stroke="rgba(99,102,241,0.15)" strokeWidth="1"
+        />
+        <circle cx={CX} cy={CY} r={28}
+          fill="rgba(0,212,255,0.05)"
+          stroke={activeColor} strokeWidth="1"
+          style={{ filter: `drop-shadow(0 0 8px ${activeColor})`, transition: 'all 0.4s' }}
+        />
+        <circle cx={CX} cy={CY} r={18}
+          fill="url(#centerGrad)"
+          style={{ filter: `drop-shadow(0 0 16px ${activeColor})`, transition: 'all 0.4s' }}
+        />
+        {/* AI label */}
+        <text x={CX} y={CY - 3}
+          textAnchor="middle" dominantBaseline="middle"
+          fontSize="9" fontFamily="Orbitron, sans-serif" fontWeight="900"
+          fill="white" opacity="0.95"
+        >
+          AI
+        </text>
+        <text x={CX} y={CY + 8}
+          textAnchor="middle" dominantBaseline="middle"
+          fontSize="6" fontFamily="Inter, sans-serif"
+          fill="rgba(255,255,255,0.5)"
+        >
+          AGENTE
+        </text>
       </svg>
+
+      {/* Step label strip */}
       <motion.div
         key={activeStep}
-        initial={{ opacity: 0, y: 3 }} animate={{ opacity: 1, y: 0 }}
-        className="font-orbitron text-xs font-bold text-center"
-        style={{ color: CYCLE_STEPS[activeStep].color, minWidth: 100 }}
+        initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="flex items-center gap-2 mt-1"
       >
-        {CYCLE_STEPS[activeStep].label}
+        <div className="w-1.5 h-1.5 rounded-full" style={{ background: activeColor, boxShadow: `0 0 8px ${activeColor}` }} />
+        <span className="font-orbitron text-xs font-bold" style={{ color: activeColor }}>
+          {STEPS[activeStep].label}
+        </span>
+        <span className="font-inter text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          — {STEPS[activeStep].sub}
+        </span>
       </motion.div>
     </div>
   )
@@ -145,53 +335,58 @@ export function Slide13Agentic({ active }: Props) {
             <p className="font-inter text-white/35 text-sm text-center">De modelos aislados a agentes autónomos</p>
           </div>
 
-          {/* Bot vs Agent comparison */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="glass-card p-4 flex flex-col items-center gap-3">
-              <div className="text-xs font-orbitron text-white/25 tracking-widest uppercase">Bot tradicional</div>
-              <div className="flex flex-col items-center gap-1.5">
-                {['Entrada', 'IF / ELSE', 'Respuesta fija'].map((s, i) => (
-                  <div key={i} className="flex flex-col items-center gap-1">
-                    <div
-                      className="px-4 py-1.5 rounded-lg text-xs font-inter font-semibold text-white/45 text-center"
-                      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', minWidth: 110 }}
-                    >
-                      {s}
-                    </div>
-                    {i < 2 && <div className="w-px h-2.5" style={{ background: 'rgba(255,255,255,0.12)' }} />}
-                  </div>
-                ))}
-              </div>
-              <div className="font-inter text-xs text-white/20 text-center">Árbol de decisión fijo</div>
-            </div>
-
-            <div
-              className="glass-card p-4 flex flex-col items-center gap-3"
-              style={{ borderColor: 'rgba(139,92,246,0.3)', background: 'rgba(139,92,246,0.04)' }}
-            >
-              <div className="text-xs font-orbitron tracking-widest uppercase" style={{ color: 'rgba(139,92,246,0.6)' }}>
-                Agente Autónomo IA
-              </div>
-              <AgentCycle active={active} />
+          {/* 3D Agent visualization — main element */}
+          <div
+            className="relative rounded-2xl overflow-hidden"
+            style={{
+              height: 340,
+              border: '1px solid rgba(139,92,246,0.2)',
+              background: 'rgba(0,2,12,0.7)',
+            }}
+          >
+            <AutonomousAgent3D />
+            <div className="absolute top-3 left-0 right-0 flex justify-center z-10 pointer-events-none">
+              <span className="font-orbitron text-[0.6rem] tracking-widest uppercase"
+                style={{ color: 'rgba(139,92,246,0.5)' }}>
+                Arquitectura — Agente Autónomo en Tiempo Real
+              </span>
             </div>
           </div>
 
-          {/* Capability cards */}
-          <div className="grid grid-cols-3 gap-3">
-            {CAPS.map(({ icon: Icon, label, sub, color }) => (
-              <div key={label} className="glass-card p-3 flex items-start gap-2.5" style={{ borderColor: `${color}20` }}>
-                <div
-                  className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5"
-                  style={{ background: `${color}12`, border: `1px solid ${color}28` }}
-                >
-                  <Icon size={14} color={color} />
-                </div>
-                <div>
-                  <div className="font-inter text-xs font-semibold text-white/65 leading-tight">{label}</div>
-                  <div className="font-inter text-xs text-white/28 leading-tight mt-0.5">{sub}</div>
-                </div>
+          {/* Bot vs Capabilities row */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Bot tradicional */}
+            <div className="glass-card p-4 flex flex-col gap-2">
+              <div className="text-xs font-orbitron text-white/25 tracking-widest uppercase text-center">Bot tradicional</div>
+              <div className="flex items-center justify-center gap-2">
+                {['Entrada', '→', 'IF/ELSE', '→', 'Respuesta fija'].map((s, i) => (
+                  <span key={i} className="text-xs font-inter"
+                    style={{ color: i % 2 === 1 ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.45)',
+                             background: i % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'none',
+                             padding: i % 2 === 0 ? '2px 8px' : '0',
+                             borderRadius: 6 }}>
+                    {s}
+                  </span>
+                ))}
               </div>
-            ))}
+              <div className="font-inter text-xs text-white/20 text-center">Árbol de decisión fijo — frágil, sin contexto</div>
+            </div>
+
+            {/* Capability cards */}
+            <div className="flex flex-col gap-2">
+              {CAPS.map(({ icon: Icon, label, sub, color }) => (
+                <div key={label} className="glass-card p-2.5 flex items-center gap-2.5" style={{ borderColor: `${color}18` }}>
+                  <div className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center"
+                    style={{ background: `${color}10`, border: `1px solid ${color}25` }}>
+                    <Icon size={12} color={color} />
+                  </div>
+                  <div>
+                    <div className="font-inter text-xs font-semibold leading-tight" style={{ color: 'rgba(255,255,255,0.65)' }}>{label}</div>
+                    <div className="font-inter text-[0.65rem] leading-tight mt-0.5" style={{ color: 'rgba(255,255,255,0.3)' }}>{sub}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Vapi Live Demo */}
