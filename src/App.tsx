@@ -15,7 +15,25 @@ import { Slide08NeuralNetworks } from '@/components/slides/Slide08NeuralNetworks
 import { Slide09Applications1 } from '@/components/slides/Slide09Applications1'
 import { Slide10Applications2 } from '@/components/slides/Slide10Applications2'
 import { Slide11Limits } from '@/components/slides/Slide11Limits'
+import { Slide13Agentic } from '@/components/slides/Slide13Agentic'
+import { Slide14Ethics } from '@/components/slides/Slide14Ethics'
 import { Slide12Conclusions } from '@/components/slides/Slide12Conclusions'
+
+// Slide index map (0-based):
+// 0  Slide01Cover
+// 1  Slide02Question
+// 2  Slide03Digitalization
+// 3  Slide04Sampling
+// 4  Slide05PhysicalData
+// 5  Slide06AIModels
+// 6  Slide07MachineLearning
+// 7  Slide08NeuralNetworks
+// 8  Slide09Applications1  (Energía)
+// 9  Slide10Applications2  (Vehículos)
+// 10 Slide11Limits
+// 11 Slide13Agentic        (Sistemas agénticos)
+// 12 Slide14Ethics         (Ética)
+// 13 Slide12Conclusions    (Conclusiones)
 
 export default function App() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -60,7 +78,7 @@ export default function App() {
         <div className="slides">
           <Slide01Cover
             onScrollDown={() => goToSlide(1)}
-            onJumpToConclusions={() => goToSlide(11)}
+            onJumpToConclusions={() => goToSlide(13)}
           />
           <Slide02Question active={currentSlide === 1} />
           <Slide03Digitalization />
@@ -72,7 +90,9 @@ export default function App() {
           <Slide09Applications1 />
           <Slide10Applications2 active={currentSlide === 9} />
           <Slide11Limits />
-          <Slide12Conclusions active={currentSlide === 11} />
+          <Slide13Agentic active={currentSlide === 11} />
+          <Slide14Ethics />
+          <Slide12Conclusions active={currentSlide === 13} />
         </div>
       </div>
     </div>

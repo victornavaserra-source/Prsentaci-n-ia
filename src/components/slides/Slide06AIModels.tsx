@@ -54,7 +54,7 @@ function NeuralNetSvg({ active }: { active: boolean }) {
   }, [active, totalNodes])
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 160 }}>
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 140 }}>
       {connections.map(([a, b], i) => (
         <line key={i}
           x1={positions[a][0]} y1={positions[a][1]}
@@ -116,9 +116,7 @@ function SpamDetector() {
           {score !== null && (
             <motion.span
               key={label}
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               className="font-orbitron font-bold text-xs"
               style={{ color: barColor, textShadow: `0 0 10px ${barColor}` }}
             >
@@ -134,24 +132,91 @@ function SpamDetector() {
 export function Slide06AIModels() {
   return (
     <section>
-      <div className="relative w-full h-[100dvh] flex flex-col items-center justify-center px-8 md:px-14 gap-8">
+      <div className="relative w-full h-[100dvh] flex flex-col items-center justify-center px-8 md:px-14 gap-7">
         <span className="ghost-num">06</span>
 
-        <div className="relative z-10 max-w-5xl w-full flex flex-col gap-7">
+        <div className="relative z-10 max-w-5xl w-full flex flex-col gap-6">
           <div className="flex flex-col items-center gap-3">
             <span className="eyebrow">Modelos de IA</span>
             <h2 className="slide-title gradient-text text-center">¿Qué es un modelo de IA?</h2>
           </div>
 
+          {/* Paradigm shift strip */}
+          <div
+            className="rounded-2xl px-5 py-4 grid grid-cols-2 gap-0 relative overflow-hidden"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+          >
+            {/* Left: rules-based */}
+            <div className="flex flex-col gap-2 pr-6">
+              <div className="text-xs font-orbitron text-white/25 tracking-widest uppercase mb-1">Antes — reglas escritas</div>
+              <div
+                className="rounded-lg px-3 py-2 font-mono text-xs leading-relaxed"
+                style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.55)' }}
+              >
+                <span style={{ color: '#f59e0b' }}>IF</span> correo contiene{' '}
+                <span style={{ color: '#10b981' }}>"oferta"</span>{' '}
+                <span style={{ color: '#f59e0b' }}>→</span>{' '}
+                <span style={{ color: '#ef4444' }}>SPAM</span>
+                <br />
+                <span style={{ color: '#f59e0b' }}>IF</span> correo contiene{' '}
+                <span style={{ color: '#10b981' }}>"gratis"</span>{' '}
+                <span style={{ color: '#f59e0b' }}>→</span>{' '}
+                <span style={{ color: '#ef4444' }}>SPAM</span>
+                <br />
+                <span style={{ color: 'rgba(255,255,255,0.2)' }}>// ¿y "descuento exclusivo"?</span>
+              </div>
+              <div className="text-xs font-inter text-white/25 italic">Humanos escriben las reglas</div>
+            </div>
+
+            {/* Divider arrow */}
+            <div className="absolute left-1/2 top-0 bottom-0 flex items-center justify-center" style={{ transform: 'translateX(-50%)', zIndex: 10 }}>
+              <div className="flex flex-col items-center gap-1">
+                <motion.div
+                  animate={{ x: [0, 6, 0], opacity: [0.4, 1, 0.4] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  className="font-orbitron text-base font-bold"
+                  style={{ color: '#8b5cf6', textShadow: '0 0 12px rgba(139,92,246,0.7)' }}
+                >
+                  →
+                </motion.div>
+                <div className="text-xs font-inter text-white/15" style={{ fontSize: '0.55rem', letterSpacing: '0.1em' }}>ML</div>
+              </div>
+            </div>
+
+            {/* Right: ML */}
+            <div className="flex flex-col gap-2 pl-6">
+              <div className="text-xs font-orbitron tracking-widest uppercase mb-1" style={{ color: 'rgba(0,212,255,0.45)' }}>
+                Después — la máquina aprende
+              </div>
+              <div
+                className="rounded-lg px-3 py-2 text-xs leading-relaxed font-inter"
+                style={{ background: 'rgba(0,212,255,0.04)', border: '1px solid rgba(0,212,255,0.12)', color: 'rgba(255,255,255,0.55)' }}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#00d4ff' }} />
+                  <span>1M emails etiquetados</span>
+                </div>
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#8b5cf6' }} />
+                  <span>Entrenamiento → patrones</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#10b981' }} />
+                  <span style={{ color: '#10b981' }}>La máquina descubre las reglas</span>
+                </div>
+              </div>
+              <div className="text-xs font-inter text-white/25 italic">Incluye casos que nadie imaginó</div>
+            </div>
+          </div>
+
           {/* Two columns */}
           <div className="relative grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Left — Scientific model */}
-            <div className="glass-card p-6 flex flex-col gap-4">
+            <div className="glass-card p-5 flex flex-col gap-4">
               <div className="text-xs font-inter text-white/30 tracking-widest uppercase">Modelo científico</div>
-              <div className="flex items-center justify-center py-4">
+              <div className="flex items-center justify-center py-3">
                 <span style={{
                   fontFamily: 'Georgia, serif',
-                  fontSize: 'clamp(2rem, 4vw, 3.5rem)',
+                  fontSize: 'clamp(2rem, 4vw, 3.2rem)',
                   color: 'rgba(255,255,255,0.85)',
                   fontStyle: 'italic',
                   textShadow: '0 0 20px rgba(255,255,255,0.15)',
@@ -167,14 +232,12 @@ export function Slide06AIModels() {
               </div>
             </div>
 
-            {/* Animated divider */}
             <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px" style={{
               background: 'linear-gradient(to bottom, transparent, rgba(0,212,255,0.25), transparent)',
               transform: 'translateX(-50%)',
             }} />
 
-            {/* Right — AI model */}
-            <div className="glass-card-cyan p-6 flex flex-col gap-4">
+            <div className="glass-card-cyan p-5 flex flex-col gap-4">
               <div className="text-xs font-inter tracking-widest uppercase" style={{ color: 'rgba(0,212,255,0.5)' }}>Modelo de IA</div>
               <NeuralNetSvg active={true} />
               <div className="flex flex-col gap-1">
@@ -188,7 +251,7 @@ export function Slide06AIModels() {
 
           {/* Spam detector */}
           <div className="relative bezel-outer">
-            <div className="bezel-inner p-5">
+            <div className="bezel-inner p-4">
               <Spotlight fill="rgba(0,212,255,0.08)" />
               <div className="relative z-10 flex flex-col gap-3">
                 <div className="text-xs font-orbitron text-white/30 tracking-widest uppercase">Demo — Detector de spam</div>
@@ -200,10 +263,11 @@ export function Slide06AIModels() {
       </div>
 
       <aside className="notes">
-        • Un modelo científico como F=ma fue diseñado explícitamente por humanos con ecuaciones.
-        • Un modelo de IA, en cambio, se construye a partir de millones de ejemplos — aprende patrones.
+        • El cambio de paradigma: antes programábamos reglas explícitas (IF...THEN). El problema: el mundo real tiene demasiadas excepciones.
+        • El machine learning invierte la lógica: en vez de "humanos escriben reglas", le damos datos etiquetados y el modelo descubre las reglas solo.
+        • Un modelo científico como F=ma fue diseñado explícitamente — funciona perfectamente para fenómenos físicos simples.
+        • Un modelo de IA aprende de millones de ejemplos — funciona para problemas donde las reglas son demasiado complejas para escribirlas.
         • El detector de spam no tiene reglas escritas: aprendió qué palabras son sospechosas de los datos.
-        • Los dos tipos de modelo son complementarios — la IA no reemplaza la física, la amplía.
       </aside>
     </section>
   )

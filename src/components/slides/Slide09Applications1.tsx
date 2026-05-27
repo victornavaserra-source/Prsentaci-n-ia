@@ -1,157 +1,233 @@
-import { useState } from 'react'
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from 'recharts'
+import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 
-function solarKwh(angle: number): number {
-  return +(Math.sin((angle * Math.PI) / 180) * 100).toFixed(1)
-}
+function ThermalPanel() {
+  const [temp, setTemp] = useState(18)
+  const [predicted, setPredicted] = useState(24)
+  const [animating, setAnimating] = useState(false)
 
-function SolarCard() {
-  const [angle, setAngle] = useState(45)
-  const kwh = solarKwh(angle)
-  const sunY = 90 - angle * 0.55
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPredicted(prev => {
+        const target = temp + 3 + Math.random() * 4
+        return +(target).toFixed(1)
+      })
+    }, 2200)
+    return () => clearInterval(interval)
+  }, [temp])
 
-  const barData = [
-    { h: '6am', v: +(kwh * 0.15).toFixed(0) },
-    { h: '9am', v: +(kwh * 0.5).toFixed(0) },
-    { h: '12pm', v: kwh },
-    { h: '3pm', v: +(kwh * 0.7).toFixed(0) },
-    { h: '6pm', v: +(kwh * 0.2).toFixed(0) },
-  ]
+  const m = 1200
+  const c = 1.005
+  const deltaT = +(predicted - temp).toFixed(1)
+  const Q = Math.round(m * c * deltaT)
+  const barW = Math.min(100, (temp / 40) * 100)
+  const predW = Math.min(100, (predicted / 40) * 100)
 
   return (
-    <div className="glass-card p-5 flex flex-col gap-4 h-full" style={{ borderColor: 'rgba(251,191,36,0.2)' }}>
-      <span className="eyebrow mx-auto" style={{ borderColor: 'rgba(251,191,36,0.3)', color: 'rgba(251,191,36,0.8)', background: 'rgba(251,191,36,0.06)' }}>
-        Panel Solar
+    <div className="glass-card p-5 flex flex-col gap-4 h-full">
+      <span
+        className="eyebrow mx-auto"
+        style={{ borderColor: 'rgba(0,212,255,0.3)', color: 'rgba(0,212,255,0.8)', background: 'rgba(0,212,255,0.06)' }}
+      >
+        Panel A — Climatización
       </span>
 
-      {/* SVG */}
-      <svg viewBox="0 0 200 110" className="w-full" style={{ height: 90 }}>
-        {/* Sky gradient */}
-        <defs>
-          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#020818" />
-            <stop offset="100%" stopColor="#0a1628" />
-          </linearGradient>
-          <radialGradient id="sunGlow" cx="50%" cy="50%">
-            <stop offset="0%" stopColor="rgba(251,191,36,0.8)" />
-            <stop offset="100%" stopColor="rgba(251,191,36,0)" />
-          </radialGradient>
-        </defs>
-        {/* Sun */}
-        <circle cx={100} cy={sunY} r={20} fill="url(#sunGlow)" />
-        <circle cx={100} cy={sunY} r={9} fill="#FBBF24" style={{ filter: 'drop-shadow(0 0 8px rgba(251,191,36,0.9))' }} />
-        {/* Rays */}
-        {Array.from({ length: 8 }, (_, i) => {
-          const rad = (i / 8) * Math.PI * 2
-          return <line key={i} x1={100} y1={sunY} x2={100 + Math.cos(rad) * 16} y2={sunY + Math.sin(rad) * 16}
-            stroke="rgba(251,191,36,0.5)" strokeWidth="1.5" strokeLinecap="round" />
-        })}
-        {/* Sunlight angle line */}
-        <line x1={100} y1={sunY} x2={100} y2={90} stroke="rgba(251,191,36,0.2)" strokeWidth="1" strokeDasharray="4 3" />
-        {/* Ground */}
-        <line x1={0} y1={90} x2={200} y2={90} stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
-        {/* Panel */}
-        <rect x={75} y={80} width={50} height={6} rx="2" fill="rgba(0,212,255,0.7)"
-          style={{ filter: 'drop-shadow(0 0 6px rgba(0,212,255,0.5))' }} />
-        {/* kWh label */}
-        <text x={100} y={107} textAnchor="middle" fill="rgba(251,191,36,0.7)" fontSize="9" fontFamily="Orbitron">
-          {kwh} kWh
-        </text>
-      </svg>
-
-      {/* Slider */}
-      <div className="flex flex-col gap-1.5">
-        <input type="range" min={0} max={90} value={angle} onChange={e => setAngle(+e.target.value)} />
-        <div className="flex justify-between text-xs font-inter text-white/40">
-          <span>Ángulo solar: <span style={{ color: '#FBBF24' }}>{angle}°</span></span>
+      <div className="flex flex-col items-center gap-1.5">
+        <span
+          style={{
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontSize: 'clamp(1.6rem, 3vw, 2.4rem)',
+            color: 'rgba(255,255,255,0.92)',
+            fontStyle: 'italic',
+            textShadow: '0 0 24px rgba(0,212,255,0.25)',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          Q = m · c · ΔT
+        </span>
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-0.5 text-xs font-inter text-white/30 mt-0.5">
+          <span><em style={{ fontFamily: 'Georgia, serif', color: 'rgba(255,255,255,0.55)' }}>Q</em> = calor (kJ)</span>
+          <span><em style={{ fontFamily: 'Georgia, serif', color: 'rgba(255,255,255,0.55)' }}>m</em> = masa (kg)</span>
+          <span><em style={{ fontFamily: 'Georgia, serif', color: 'rgba(255,255,255,0.55)' }}>c</em> = calor específico</span>
+          <span><em style={{ fontFamily: 'Georgia, serif', color: 'rgba(255,255,255,0.55)' }}>ΔT</em> = variación temp.</span>
         </div>
       </div>
 
-      {/* Bar chart */}
-      <div style={{ height: 70 }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={barData} margin={{ top: 0, right: 0, left: -30, bottom: 0 }}>
-            <XAxis dataKey="h" tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 8 }} tickLine={false} axisLine={false} />
-            <YAxis tick={{ fill: 'rgba(255,255,255,0.2)', fontSize: 8 }} tickLine={false} axisLine={false} domain={[0, 105]} />
-            <Tooltip
-              content={({ active, payload }) =>
-                active && payload?.length
-                  ? <div className="glass-card px-2 py-1 text-xs font-orbitron" style={{ color: '#FBBF24' }}>{payload[0].value} kWh</div>
-                  : null
-              }
-            />
-            <Bar dataKey="v" radius={[2, 2, 0, 0]}>
-              {barData.map((_entry, i) => (
-                <Cell key={i} fill={i === 2 ? '#FBBF24' : 'rgba(251,191,36,0.35)'} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+      <div className="flex flex-col gap-2.5">
+        <div className="flex justify-between text-xs font-inter text-white/40">
+          <span>T. actual: <span style={{ color: '#00d4ff' }}>{temp}°C</span></span>
+          <span>IA predice: <span style={{ color: '#8b5cf6' }}>{predicted}°C</span></span>
+        </div>
+        <div className="relative h-3 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
+          <motion.div
+            animate={{ width: `${barW}%` }}
+            transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+            className="absolute h-full rounded-full"
+            style={{ background: 'rgba(0,212,255,0.5)', left: 0 }}
+          />
+          <motion.div
+            animate={{ left: `${predW}%` }}
+            transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }}
+            className="absolute top-0 w-1 h-full rounded-full"
+            style={{ background: '#8b5cf6', boxShadow: '0 0 8px rgba(139,92,246,0.9)', transform: 'translateX(-50%)' }}
+          />
+        </div>
+        <input
+          type="range" min={10} max={35} value={temp}
+          onChange={e => setTemp(+e.target.value)}
+          className="w-full"
+        />
       </div>
 
-      <p className="font-inter text-xs text-white/30 text-center">La IA predice producción según radiación</p>
+      <div
+        className="rounded-xl px-4 py-2.5 flex items-center justify-between"
+        style={{ background: 'rgba(0,212,255,0.06)', border: '1px solid rgba(0,212,255,0.12)' }}
+      >
+        <span className="font-inter text-xs text-white/35">Calor a anticipar:</span>
+        <span
+          className="font-orbitron font-black text-sm"
+          style={{ color: '#00d4ff', textShadow: '0 0 12px rgba(0,212,255,0.5)' }}
+        >
+          {Q.toLocaleString()} kJ
+        </span>
+      </div>
+
+      <p className="font-inter text-xs text-white/25 text-center leading-relaxed">
+        La IA predice ΔT cruzando datos meteorológicos y calcula Q con antelación para evitar picos de consumo
+      </p>
     </div>
   )
 }
 
-function TurbineCard() {
-  const [speed, setSpeed] = useState(15)
-  const status = speed < 4 ? 'APAGADA' : speed > 30 ? 'EMERGENCIA' : 'GENERANDO'
-  const statusColor = speed < 4 ? 'rgba(255,255,255,0.3)' : speed > 30 ? '#ef4444' : '#10b981'
-  const kw = speed < 4 ? 0 : speed > 30 ? 0 : Math.round((speed / 30) * 1500)
-  const spinDur = speed < 4 || speed > 30 ? '0s' : `${Math.max(0.5, 4 - speed * 0.1)}s`
-  const spinning = speed >= 4 && speed <= 30
+function JoulePanel() {
+  const [intensity, setIntensity] = useState(85)
+  const [optimizedI, setOptimizedI] = useState(85)
+  const [optimizing, setOptimizing] = useState(false)
+  const [done, setDone] = useState(false)
+
+  const R = 0.5
+  const t = 3600
+  const E_raw = Math.round((intensity ** 2) * R * t / 1000)
+  const E_opt = Math.round((optimizedI ** 2) * R * t / 1000)
+  const savings = intensity !== optimizedI ? Math.round(((E_raw - E_opt) / E_raw) * 100) : 0
+
+  useEffect(() => {
+    setOptimizedI(intensity)
+    setDone(false)
+    setOptimizing(false)
+  }, [intensity])
+
+  function handleOptimize() {
+    if (optimizing || done) return
+    setOptimizing(true)
+    const target = Math.round(intensity * 0.63)
+    let cur = intensity
+    const step = setInterval(() => {
+      cur = cur - (cur - target) * 0.12
+      setOptimizedI(Math.round(cur))
+      if (Math.abs(cur - target) < 1) {
+        clearInterval(step)
+        setOptimizedI(target)
+        setOptimizing(false)
+        setDone(true)
+      }
+    }, 40)
+  }
+
+  const maxE = Math.round((150 ** 2) * R * t / 1000)
 
   return (
-    <div className="glass-card p-5 flex flex-col gap-4 h-full" style={{ borderColor: 'rgba(16,185,129,0.2)' }}>
-      <span className="eyebrow mx-auto" style={{ borderColor: 'rgba(16,185,129,0.3)', color: 'rgba(52,211,153,0.8)', background: 'rgba(16,185,129,0.06)' }}>
-        Turbina Eólica
+    <div className="glass-card p-5 flex flex-col gap-4 h-full" style={{ borderColor: 'rgba(139,92,246,0.2)' }}>
+      <span
+        className="eyebrow mx-auto"
+        style={{ borderColor: 'rgba(139,92,246,0.3)', color: 'rgba(167,139,250,0.8)', background: 'rgba(139,92,246,0.06)' }}
+      >
+        Panel B — Red Eléctrica
       </span>
 
-      <div className="flex justify-center">
-        <svg viewBox="0 0 120 110" width="120" height="100">
-          {/* Tower */}
-          <polygon points="56,40 64,40 68,100 52,100" fill="rgba(255,255,255,0.12)" />
-          {/* Hub */}
-          <circle cx="60" cy="38" r="7" fill={statusColor} style={{ filter: `drop-shadow(0 0 8px ${statusColor})` }} />
-          {/* Blades */}
-          <g style={{ transformOrigin: '60px 38px', animation: spinning ? `spin ${spinDur} linear infinite` : 'none' }}>
-            {[0, 120, 240].map(deg => (
-              <ellipse key={deg} cx="60" cy="18" rx="4.5" ry="21"
-                fill={`${statusColor}cc`}
-                style={{ transformOrigin: '60px 38px', transform: `rotate(${deg}deg)`, filter: `drop-shadow(0 0 3px ${statusColor}80)` }} />
-            ))}
-          </g>
-          {/* kW label */}
-          <text x="60" y="108" textAnchor="middle" fill={statusColor} fontSize="9" fontFamily="Orbitron">
-            {kw > 0 ? `${kw} kW` : '—'}
-          </text>
-        </svg>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <input type="range" min={0} max={50} value={speed} onChange={e => setSpeed(+e.target.value)} />
-        <div className="flex justify-between text-xs font-inter">
-          <span className="text-white/40">Viento: <span style={{ color: '#00d4ff' }}>{speed} m/s</span></span>
-          <span className="font-orbitron font-bold text-xs" style={{ color: statusColor }}>{status}</span>
+      <div className="flex flex-col items-center gap-1.5">
+        <span
+          style={{
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontSize: 'clamp(1.6rem, 3vw, 2.4rem)',
+            color: 'rgba(255,255,255,0.92)',
+            fontStyle: 'italic',
+            textShadow: '0 0 24px rgba(139,92,246,0.25)',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          E = I² · R · t
+        </span>
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-0.5 text-xs font-inter text-white/30 mt-0.5">
+          <span><em style={{ fontFamily: 'Georgia, serif', color: 'rgba(255,255,255,0.55)' }}>E</em> = energía disipada</span>
+          <span><em style={{ fontFamily: 'Georgia, serif', color: 'rgba(255,255,255,0.55)' }}>I</em> = intensidad (A)</span>
+          <span><em style={{ fontFamily: 'Georgia, serif', color: 'rgba(255,255,255,0.55)' }}>R</em> = resistencia (Ω)</span>
+          <span><em style={{ fontFamily: 'Georgia, serif', color: 'rgba(255,255,255,0.55)' }}>t</em> = tiempo (s)</span>
         </div>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        {[
-          { label: '< 4 m/s', info: 'Sin viento suficiente', color: 'rgba(255,255,255,0.25)' },
-          { label: '4–30 m/s', info: 'Zona óptima de generación', color: '#10b981' },
-          { label: '> 30 m/s', info: 'Parada de emergencia', color: '#ef4444' },
-        ].map(({ label, info, color }) => (
-          <div key={label} className="flex items-center gap-2 text-xs font-inter">
-            <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color }} />
-            <span className="font-bold" style={{ color, minWidth: 60 }}>{label}</span>
-            <span className="text-white/30">{info}</span>
+      <div className="flex flex-col gap-2.5">
+        <div className="flex justify-between text-xs font-inter text-white/40">
+          <span>Intensidad: <span style={{ color: '#8b5cf6' }}>{intensity} A</span></span>
+          {done && (
+            <span>IA → <span style={{ color: '#10b981' }}>{optimizedI} A</span></span>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-inter text-white/25 w-14 flex-shrink-0">Sin IA</span>
+            <div className="flex-1 h-2.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{ width: `${(E_raw / maxE) * 100}%`, background: '#ef4444', boxShadow: '0 0 8px rgba(239,68,68,0.4)' }}
+              />
+            </div>
+            <span className="text-xs font-orbitron text-white/35 w-16 text-right flex-shrink-0">{E_raw.toLocaleString()} kJ</span>
           </div>
-        ))}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-inter text-white/25 w-14 flex-shrink-0">Con IA</span>
+            <div className="flex-1 h-2.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
+              <motion.div
+                animate={{ width: `${(E_opt / maxE) * 100}%` }}
+                transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
+                className="h-full rounded-full"
+                style={{ background: '#10b981', boxShadow: '0 0 8px rgba(16,185,129,0.4)' }}
+              />
+            </div>
+            <span className="text-xs font-orbitron w-16 text-right flex-shrink-0" style={{ color: done ? '#10b981' : 'rgba(255,255,255,0.3)' }}>
+              {E_opt.toLocaleString()} kJ
+            </span>
+          </div>
+        </div>
+
+        <input
+          type="range" min={40} max={150} value={intensity}
+          onChange={e => setIntensity(+e.target.value)}
+          className="w-full"
+        />
       </div>
 
-      <p className="font-inter text-xs text-white/30 text-center">La IA decide cuándo encender y apagar</p>
+      <button
+        onClick={handleOptimize}
+        className="py-2.5 px-4 rounded-xl font-orbitron text-xs font-bold tracking-wider transition-all duration-300"
+        style={{
+          background: done ? 'rgba(16,185,129,0.12)' : optimizing ? 'rgba(139,92,246,0.15)' : 'rgba(139,92,246,0.15)',
+          border: `1px solid ${done ? 'rgba(16,185,129,0.4)' : 'rgba(139,92,246,0.35)'}`,
+          color: done ? '#10b981' : optimizing ? 'rgba(167,139,250,0.6)' : '#a78bfa',
+          cursor: done || optimizing ? 'default' : 'pointer',
+        }}
+      >
+        {done
+          ? `✓ OPTIMIZADO — —${savings}% pérdidas`
+          : optimizing
+          ? '▶ OPTIMIZANDO...'
+          : '▶ ACTIVAR IA — MINIMIZAR JOULE'}
+      </button>
+
+      <p className="font-inter text-xs text-white/25 text-center leading-relaxed">
+        La IA controla I para minimizar E disipada como calor — reducir I 37% = —60% en pérdidas (I²)
+      </p>
     </div>
   )
 }
@@ -164,26 +240,26 @@ export function Slide09Applications1() {
 
         <div className="relative z-10 max-w-5xl w-full flex flex-col gap-7">
           <div className="flex flex-col items-center gap-3">
-            <span className="eyebrow">Aplicaciones Reales</span>
-            <h2 className="slide-title gradient-text text-center">IA en energías renovables</h2>
+            <span className="eyebrow">Aplicaciones Físicas</span>
+            <h2 className="slide-title gradient-text text-center">IA en energía</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <SolarCard />
-            <TurbineCard />
+            <ThermalPanel />
+            <JoulePanel />
           </div>
 
-          <p className="font-inter text-xs text-white/25 text-center tracking-widest uppercase">
-            La IA optimiza la producción energética en tiempo real · Más eficiencia · Menos residuos
+          <p className="font-inter text-xs text-white/20 text-center tracking-widest uppercase">
+            Optimización energética · Menos picos · Menos pérdidas · Más eficiencia
           </p>
         </div>
       </div>
 
       <aside className="notes">
-        • El panel solar: la IA predice cuánta energía generará según el ángulo del sol y las nubes.
-        • La turbina: la IA decide cuándo encender, cuándo parar, y cómo orientar las palas.
-        • En el mundo real, estas IAs procesan datos de sensores cada pocos segundos.
-        • En España, el 50% de la electricidad ya proviene de renovables gestionadas por IA.
+        • Panel A: Q = m·c·ΔT — la IA predice ΔT cruzando datos meteorológicos y sensoriales, y calcula con antelación el calor Q necesario. Evita picos de consumo anticipando la demanda.
+        • Panel B: E = I²·R·t — la energía disipada como calor (efecto Joule) crece con el cuadrado de I. Reducir I un 37% reduce pérdidas ~60%. La IA controla I en tiempo real en la red.
+        • Aplicaciones reales: climatización de edificios inteligentes, gestión de redes eléctricas, trenes de alta velocidad.
+        • La clave: la IA no "sabe" física — aplica patrones sobre millones de mediciones para predecir y optimizar.
       </aside>
     </section>
   )
