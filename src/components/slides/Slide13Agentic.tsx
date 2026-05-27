@@ -344,7 +344,7 @@ export function Slide13Agentic({ active }: Props) {
               background: 'rgba(0,2,12,0.7)',
             }}
           >
-            <AutonomousAgent3D active={active} />
+            <AutonomousAgent3D />
             <div className="absolute top-3 left-0 right-0 flex justify-center z-10 pointer-events-none">
               <span className="font-orbitron text-[0.6rem] tracking-widest uppercase"
                 style={{ color: 'rgba(139,92,246,0.5)' }}>
