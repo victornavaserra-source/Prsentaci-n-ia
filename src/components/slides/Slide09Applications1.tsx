@@ -4,11 +4,10 @@ import { motion } from 'framer-motion'
 function ThermalPanel() {
   const [temp, setTemp] = useState(18)
   const [predicted, setPredicted] = useState(24)
-  const [animating, setAnimating] = useState(false)
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setPredicted(prev => {
+      setPredicted(() => {
         const target = temp + 3 + Math.random() * 4
         return +(target).toFixed(1)
       })

@@ -2,9 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Brain, Layers, Eye, Phone, PhoneOff, Mic } from 'lucide-react'
 
-// Replace with actual Vapi credentials before the live demo
-const VAPI_PUBLIC_KEY = 'INSERTAR_PUBLIC_KEY'
-const VAPI_ASSISTANT_ID = 'INSERTAR_ASSISTANT_ID'
+const VAPI_PUBLIC_KEY = import.meta.env.VITE_VAPI_PUBLIC_KEY as string
+const VAPI_ASSISTANT_ID = import.meta.env.VITE_VAPI_ASSISTANT_ID as string
 
 type CallState = 'idle' | 'connecting' | 'active' | 'ended'
 interface Props { active: boolean }

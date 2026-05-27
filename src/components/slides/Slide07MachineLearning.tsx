@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 const STEPS = [
   { label: 'DATOS', sub: 'Entradas de entrenamiento', color: '#00d4ff' },
